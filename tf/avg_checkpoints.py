@@ -44,7 +44,7 @@ def checkpoint_exists(path):
 
 
 def main(_):
-    tf.logging.set_verbosity(tf.logging.INFO)
+    tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.INFO)
     if FLAGS.checkpoints:
         # Get the checkpoints list from flags and run some basic checks.
         checkpoints = [c.strip() for c in FLAGS.checkpoints.split(",")]
@@ -73,9 +73,9 @@ def main(_):
                              os.path.dirname(FLAGS.prefix))
 
     # Read variables from all checkpoints and average them.
-    tf.logging.info("Reading variables and averaging checkpoints:")
+    tf.compat.v1.logging.info("Reading variables and averaging checkpoints:")
     for c in checkpoints:
-        tf.logging.info("%s ", c)
+        tf.compat.v1.logging.info("%s ", c)
     var_list = tf.contrib.framework.list_variables(checkpoints[0])
     var_values, var_dtypes = {}, {}
     for (name, shape) in var_list:
@@ -87,7 +87,7 @@ def main(_):
             tensor = reader.get_tensor(name)
             var_dtypes[name] = tensor.dtype
             var_values[name] += tensor
-        tf.logging.info("Read from checkpoint %s", checkpoint)
+        tf.compat.v1.logging.info("Read from checkpoint %s", checkpoint)
     for name in var_values:  # Average.
         var_values[name] /= len(checkpoints)
 
@@ -111,7 +111,7 @@ def main(_):
         # Use the built saver to save the averaged checkpoint.
         saver.save(sess, FLAGS.output_path, global_step=global_step)
 
-    tf.logging.info("Averaged checkpoints saved in %s", FLAGS.output_path)
+    tf.compat.v1.logging.info("Averaged checkpoints saved in %s", FLAGS.output_path)
 
 
 if __name__ == "__main__":

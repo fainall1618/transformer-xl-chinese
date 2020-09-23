@@ -342,7 +342,7 @@ def get_input_fn(record_info_dir, split, per_host_bsz, tgt_len,
     bin_sizes = record_info["bin_sizes"]
     num_batch = record_info["num_batch"]
 
-    tf.logging.info("[{}] File names {}".format(split, file_names))
+    tf.compat.v1.logging.info("[{}] File names {}".format(split, file_names))
 
     def input_fn(params):
         # per-core batch size
