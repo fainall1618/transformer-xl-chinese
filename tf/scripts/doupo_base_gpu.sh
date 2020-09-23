@@ -38,7 +38,7 @@ TEST_NUM_CORE=1
 
 
 if [[ $1 == 'train_data' ]]; then
-    python data_utils_chinese.py \
+    python3 data_utils_chinese.py \
         --data_dir=${DATA_ROOT}/ \
         --dataset=doupo \
         --tgt_len=${TGT_LEN} \
@@ -48,7 +48,7 @@ if [[ $1 == 'train_data' ]]; then
         --use_tpu=False \
         ${@:2}
 elif [[ $1 == 'test_data' ]]; then
-    python data_utils_chinese.py \
+    python3 data_utils_chinese.py \
         --data_dir=${DATA_ROOT}/ \
         --dataset=doupo \
         --tgt_len=${TEST_TGT_LEN} \
@@ -58,7 +58,7 @@ elif [[ $1 == 'test_data' ]]; then
         ${@:2}
 elif [[ $1 == 'train' ]]; then
     echo 'Run training...'
-    CUDA_VISIBLE_DEVICES='0,1,2,3' python train_gpu.py \
+    CUDA_VISIBLE_DEVICES='0,1,2,3' python3 train_gpu.py \
         --data_dir=${DATA_ROOT}/tfrecords \
         --record_info_dir=${DATA_ROOT}/tfrecords/ \
         --corpus_info_path=${DATA_ROOT}/corpus-info.json \
@@ -86,7 +86,7 @@ elif [[ $1 == 'train' ]]; then
         ${@:2}
 elif [[ $1 == 'eval' ]]; then
     echo 'Run evaluation...'
-    python train_gpu.py \
+    python3 train_gpu.py \
         --data_dir=${DATA_ROOT}/tfrecords \
         --record_info_dir=${DATA_ROOT}/tfrecords/ \
         --corpus_info_path=${DATA_ROOT}/corpus-info.json \
@@ -114,7 +114,7 @@ elif [[ $1 == 'eval' ]]; then
         ${@:2}
 elif [[ $1 == 'inference' ]]; then
     echo 'Run inference...'
- CUDA_VISIBLE_DEVICES='0'   python train_gpu.py \
+ CUDA_VISIBLE_DEVICES='0'   python3 train_gpu.py \
         --data_dir=${DATA_ROOT}/tfrecords \
         --record_info_dir=${DATA_ROOT}/tfrecords/ \
         --corpus_info_path=${DATA_ROOT}/corpus-info.json \

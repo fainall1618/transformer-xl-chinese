@@ -198,7 +198,7 @@ def get_model_fn(n_token, cutoffs):
 
         # number of parameters
         num_params = sum([np.prod(v.shape) for v in tf.trainable_variables()])
-        tf.logging.info('#params: {}'.format(num_params))
+        tf.compat.v1.logging.info('#params: {}'.format(num_params))
 
         # format_str = '{{:<{0}s}}\t{{}}'.format(
         #     max([len(v.name) for v in tf.trainable_variables()]))
@@ -244,7 +244,7 @@ def train(n_token, cutoffs, ps_device):
         num_hosts=1,
         use_tpu=False)
 
-    tf.logging.info("num of batches {}".format(train_record_info["num_batch"]))
+    tf.compat.v1.logging.info("num of batches {}".format(train_record_info["num_batch"]))
 
     # Create computational graph
     train_set = train_input_fn({
@@ -343,7 +343,7 @@ def train(n_token, cutoffs, ps_device):
         train_writer = tf.summary.FileWriter(os.path.join(FLAGS.model_dir, "log"), sess.graph)
 
         if FLAGS.warm_start_path is not None:
-            tf.logging.info("warm start from {}".format(FLAGS.warm_start_path))
+            tf.compat.v1.logging.info("warm start from {}".format(FLAGS.warm_start_path))
             saver.restore(sess, FLAGS.warm_start_path)
 
         fetches = [loss, tower_new_mems, global_step, gnorm, learning_rate, train_op]
@@ -366,7 +366,7 @@ def train(n_token, cutoffs, ps_device):
 
             if curr_step > 0 and curr_step % FLAGS.iterations == 0:
                 curr_loss = total_loss / (curr_step - prev_step)
-                tf.logging.info("[{}] | gnorm {:.2f} lr {:8.6f} "
+                tf.compat.v1.logging.info("[{}] | gnorm {:.2f} lr {:8.6f} "
                                 "| loss {:.2f} | pplx {:>7.2f}, bpc {:>7.4f}".format(curr_step, fetched[-3], fetched[-2], curr_loss, math.exp(curr_loss), curr_loss / math.log(2)))
                 total_loss, prev_step = 0., curr_step
                 train_writer.add_summary(summary, curr_step)
@@ -374,7 +374,7 @@ def train(n_token, cutoffs, ps_device):
             if curr_step > 0 and curr_step % FLAGS.save_steps == 0:
                 save_path = os.path.join(FLAGS.model_dir, "model-{}.ckpt".format(curr_step))
                 saver.save(sess, save_path)
-                tf.logging.info("Model saved in path: {}".format(save_path))
+                tf.compat.v1.logging.info("Model saved in path: {}".format(save_path))
 
             if curr_step == FLAGS.train_steps:
                 train_writer.close()
@@ -395,7 +395,7 @@ def evaluate(n_token, cutoffs, ps_device):
     num_batch = eval_record_info["num_batch"]
     if FLAGS.max_eval_batch > 0:
         num_batch = FLAGS.max_eval_batch
-    tf.logging.info("num of batches {}".format(num_batch))
+    tf.compat.v1.logging.info("num of batches {}".format(num_batch))
 
     # Create computational graph
     eval_set = eval_input_fn({
@@ -451,7 +451,7 @@ def evaluate(n_token, cutoffs, ps_device):
             eval_ckpt_path = tf.train.latest_checkpoint(FLAGS.model_dir)
         else:
             eval_ckpt_path = FLAGS.eval_ckpt_path
-        tf.logging.info("Evaluate {}".format(eval_ckpt_path))
+        tf.compat.v1.logging.info("Evaluate {}".format(eval_ckpt_path))
         saver.restore(sess, eval_ckpt_path)
 
         fetches = [loss, tower_new_mems, tf.size(label_feed)]
@@ -462,7 +462,7 @@ def evaluate(n_token, cutoffs, ps_device):
         total_loss, total_cnt = 0, 0
         for step in range(num_batch):
             if step % (num_batch // 10) == 0:
-                tf.logging.info(format_str.format(step, num_batch))
+                tf.compat.v1.logging.info(format_str.format(step, num_batch))
 
             feed_dict = {}
             for i in range(FLAGS.num_core_per_host):
@@ -476,7 +476,7 @@ def evaluate(n_token, cutoffs, ps_device):
             total_cnt += cnt_np
 
         avg_loss = total_loss / total_cnt
-        tf.logging.info("| loss {:.2f} | pplx {:>7.2f}, bpc {:>7.4f}".format(
+        tf.compat.v1.logging.info("| loss {:.2f} | pplx {:>7.2f}, bpc {:>7.4f}".format(
             avg_loss, math.exp(avg_loss), avg_loss / math.log(2)))
 
 
@@ -489,7 +489,7 @@ def main(unused_argv):
     corpus_info = data_utils.get_corpus_info(FLAGS.corpus_info_path)
     n_token = corpus_info["vocab_size"]
     cutoffs = corpus_info["cutoffs"][1:-1]
-    tf.logging.info("n_token {}".format(n_token))
+    tf.compat.v1.logging.info("n_token {}".format(n_token))
 
     if FLAGS.do_train:
         train(n_token, cutoffs, "/gpu:0")
@@ -724,7 +724,7 @@ def get_model_fn_for_inference(n_token, cutoffs):
 
         # number of parameters
         num_params = sum([np.prod(v.shape) for v in tf.trainable_variables()])
-        tf.logging.info('#params: {}'.format(num_params))
+        tf.compat.v1.logging.info('#params: {}'.format(num_params))
 
         return new_mems, output, new_mems_id, attn_prob
 
@@ -732,4 +732,4 @@ def get_model_fn_for_inference(n_token, cutoffs):
 
 
 if __name__ == "__main__":
-    tf.app.run()
+    tf.compat.v1.app.run()
