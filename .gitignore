@@ -2,3 +2,7 @@
 *.txt
 *.pyc
 *.txt
+.idea/
+data/.DS_Store
+data/poetry/.DS_Store
+.DS_Store
